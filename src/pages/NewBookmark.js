@@ -26,7 +26,7 @@ export default function NewBookmark(){
                 <input type='url' id='url' name='url' />
                 <br />
                 <button style={{marginTop: '20px', width: '20%', color: 'black', marginRight: '20px', height: '40px'}}type='submit'>{!submitting ? 'Submit' : 'Submitting...'}</button>
-                <button style={{marginTop: '20px', width: '20%', color: 'black', marginLeft: '20px', height: '40px'}}type='button'>Cancel</button>
+                <button style={{marginTop: '20px', width: '20%', color: 'black', marginLeft: '20px', height: '40px'}}type='button' onClick={() => navigate('..')}>Cancel</button>
             </Form>
         </div>
     </>
@@ -41,7 +41,7 @@ export async function action({request}){
         url: data.get('url')
     };
 
-    const response = await fetch (`https://react-http-app-9d66f-default-rtdb.firebaseio.com/bookmarks.json`, {
+    const response = await fetch (`https://react-http-app-9d66f-default-rtdb.firebaseio.com/bookmarks/${dataToSend.key}.json`, {
         method: 'POST',
         body: JSON.stringify(dataToSend)
     })

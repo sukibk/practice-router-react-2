@@ -6,7 +6,8 @@ import RootPage, {
 } from "./pages/Root";
 import HomePage from "./pages/Home";
 import BookmarkPage, {
-    loader as bookmarkPageLoader
+    loader as bookmarkPageLoader,
+    action as deleteAction
 }from "./pages/Bookmark";
 import EditBookmark, {
     loader as editBookmarkLoader,
@@ -32,7 +33,10 @@ const router = createBrowserRouter(
               {
                   path: ':bookmarkId',
                   element: <BookmarkPage/>,
-                  loader: bookmarkPageLoader
+                  id: 'route-loader',
+                  loader: bookmarkPageLoader,
+                  errorElement: <ErrorPage/>,
+                  action: deleteAction
               },
               {
                   path: ':bookmarkId/edit',

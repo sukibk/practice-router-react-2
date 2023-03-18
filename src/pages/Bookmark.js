@@ -1,28 +1,49 @@
-import {NavLink, useLoaderData} from 'react-router-dom';
+import {Form, Await, defer, NavLink, redirect, useLoaderData, json} from 'react-router-dom';
 import ContextDescription from "../components/ContextDescription";
+import {Suspense} from "react";
+import Bookmark from "../components/Bookmark";
 
 export default function BookmarkPage(){
-    const bookmark = useLoaderData();
+    const {bookmark} = useLoaderData();
+
     return(
     <>
-        <div className="w3-container w3-teal">
-            <h1>{bookmark ? bookmark.title : 'No Title'}</h1>
-        </div>
-
-        {/*<img src="img_car.jpg" alt="Car" style={{width: '100%'}} />*/}
-
-        <div className="w3-container">
-            <h2><a href={`${bookmark ? bookmark.url : ''}`} target='_blank'>Visit WebPage</a></h2>
-            <NavLink to='edit'>Edit</NavLink> <br/>
-            <NavLink to=''>Delete</NavLink>
-        </div>
-
+        <Suspense fallback={<p style={{all: 'unset'}}>Loading...</p>}>
+            <Await resolve={bookmark}>
+                {bookmarkData => {console.log(bookmark);
+                    return <Bookmark results={bookmarkData} />}}
+            </Await>
+        </Suspense>
     </>
     )
 }
 
-export async function loader({params}){
+async function loadBookmark(id){
+    const results = await fetch(`https://react-http-app-9d66f-default-rtdb.firebaseio.com/bookmarks/${id}.json`);
+
+    if(!results.ok)
+    {
+        throw json({message: 'Could not fetch details for selected event.'},
+            {status: 500})
+    }
+    else{
+    const data = await results.json();
+    console.log(data)
+    return data;}
+}
+
+export async function action({request, params}){
+    const data = await request.formData();
     const bookmarkId = params.bookmarkId;
-    const results = await fetch(`https://react-http-app-9d66f-default-rtdb.firebaseio.com/bookmarks/${bookmarkId}.json`);
-    return results;
+    const response1 = await fetch (`https://react-http-app-9d66f-default-rtdb.firebaseio.com/bookmarks/${bookmarkId}.json`, {
+        method: request.method
+    })
+    return redirect('..')
+}
+
+export async function loader({params}){
+    const id = params.bookmarkId;
+    return defer({
+        bookmark: loadBookmark(id)
+    })
 }
